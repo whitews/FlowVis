@@ -49,3 +49,15 @@ circle {
     stroke: #466d9f;
     stroke-width: 1.5px;
 }
+
+circle.selected {
+    fill: yellow;
+    stroke: lime;
+}
+
+.brush .extent {
+    z-index: -1;
+    stroke: #bbb;
+    stroke-width: 1.5px;
+    fill-opacity: .02;
+}
