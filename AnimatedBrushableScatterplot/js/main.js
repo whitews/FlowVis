@@ -147,7 +147,7 @@ function plot() {
         .call(brush);
 
     // Update the cx & cy attributes of our circles
-    circles.transition().duration(2000)
+    circles.transition().duration(transition_ms)
         .attr("cx", function (d) { return x_scale(d[x_cat]); })
         .attr("cy", function (d) { return y_scale(d[y_cat]); });
 }
