@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>FlowVis</title>
+  <link rel="stylesheet" type="text/css" media="all" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div id="title">Simple Scatterplot</div>
+    </div>
+
+    <div class="row">
+      <span class="offset1 span3">
+      </span>
+      <span class="span3">
+      </span>
+      <span class="span2">
+        <br/>
+        <button class="btn btn-primary" onclick="window.location.reload()">Reload</button>
+      </span>
+    </div>
+
+    <div class="row">
+      <div class="span9" id="scatterplot"></div>
+      <div class="span3" id="instructions">
+        <p>
+          A simple scatterplot of flow cytometry data. Hover over a data
+          point to see it's coordinates.
+        </p>
+        <p>
+          Click the button to re-load the page with a random set of
+          parameters.
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
