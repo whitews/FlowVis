@@ -88,7 +88,7 @@ d3.csv("example.csv", function(error, data) {
 
     // Canvas scaling function is a bit different...origin different???
     x_scale_canvas = d3.scale.linear().domain(x_range).range([margin.left, width-margin.right]);
-    y_scale_canvas = d3.scale.linear().domain(y_range).range([margin.top, height-margin.bottom]);
+    y_scale_canvas = d3.scale.linear().domain(y_range).range([(height-margin.bottom), margin.top]);
 
     // Update axes with the proper scaling
     x_axis.call(d3.svg.axis().scale(x_scale).orient("bottom"));
@@ -98,8 +98,12 @@ d3.csv("example.csv", function(error, data) {
     data.forEach(function (d) {
         ctx.fillStyle = "#466d9f";
         ctx.beginPath();
-        ctx.arc(x_scale_canvas(d[x_cat]), y_scale_canvas(d[y_cat]), 2, 0, 2*Math.PI);
-        ctx.stroke();
+        ctx.arc(
+            x_scale_canvas(d[x_cat]),
+            y_scale_canvas(d[y_cat]),
+            1,
+            0,
+            2*Math.PI);
         ctx.fill();
     })
 });

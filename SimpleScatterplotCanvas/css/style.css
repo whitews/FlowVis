@@ -43,17 +43,12 @@ body {
     font-weight: 900;
 }
 
-circle {
-    z-index: 100;
-    fill: #466d9f;
-    stroke: #466d9f;
-    stroke-width: 0;
-}
 #scatterplot {
     position: relative;
 }
+
 canvas {
     position: absolute;
     left: 0;
-    bottom: 0;
+    top: 0;
 }
