@@ -13,83 +13,79 @@ heat = function() {
     var heat = {};
 
     var default_gradient = {
-        0.45: "rgb(0,0,255)",
-        0.55: "rgb(0,255,255)",
-        0.65: "rgb(0,255,0)",
-        0.95: "yellow",
-        1.0: "rgb(255,0,0)"
+        0.00: "powderblue",
+        0.25: "blue",
+        0.45: "lime",
+        0.60: "yellow",
+        0.75: "orange",
+        0.85: "coral",
+        0.90: "red",
+        0.95: "maroon",
+        0.98: "rgb(64,0,0)",
+        1.00: "black"
     };
 
     var heat_map = function heat_map(config) {
-        var _ = {};
+        this.radius = config.radius || 5;
+        this.gradient = config.gradient || default_gradient;
+        this.opacity = config.opacity || 180;
+        this.canvas = config.canvas;
 
-        this.get = function(key){
-            return _[key];
-        };
-        this.set = function(key, value){
-            _[key] = value;
-        };
-        this.configure(config);
-        this.init();
-    };
+        var translate = config.translate || [0,0];
+        var ctx = this.canvas.getContext("2d");
+        var orig_width = this.canvas.width;
+        var orig_height = this.canvas.height;
 
-    heat_map.prototype = {
-        configure: function(config){
-            var me = this;
-            me.set("radius", config.radius || 40);
-            me.set("gradient", config.gradient || default_gradient);
-            me.set("opacity", config.opacity || 180);
-            me.set("canvas", config.canvas);
-            me.set("translate", config.translate || [0,0]);
-        },
-        init: function(){
-            var me = this;
-            var canvas = me.get("canvas");
-            var ctx = canvas.getContext("2d");
-            var translate = me.get("translate");
+        this.canvas.width = 1;
+        this.canvas.height = 256;
+        var grad = ctx.createLinearGradient(0,0,1,256);
 
-            var gradient = me.get("gradient");
-
-            var orig_width = canvas.width;
-            var orig_height = canvas.height;
-
-            canvas.width = "1";
-            canvas.height = "256";
-            var grad = ctx.createLinearGradient(0,0,1,256);
-
-            for(var x in gradient){
-                grad.addColorStop(x, gradient[x]);
+        for(var x in this.gradient) {
+            if (this.gradient.hasOwnProperty(x)) {
+                grad.addColorStop(Number(x), this.gradient[x]);
             }
+        }
 
-            ctx.fillStyle = grad;
-            ctx.fillRect(0,0,1,256);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0,0,1,256);
 
-            me.set("gradient", ctx.getImageData(0,0,1,256).data);
+        this.gradient = ctx.getImageData(0,0,1,256).data;
 
-            canvas.width = orig_width;
-            canvas.height = orig_height;
+        this.canvas.width = orig_width;
+        this.canvas.height = orig_height;
 
-            // Have to re-apply any transformation here
-            ctx.translate(translate[0], translate[1]);
-        },
-        setDataSet: function(obj) {
-            var me = this,
-                d = obj.data,
-                dlen = d.length;
+        // Have to re-apply any transformation here
+        ctx.translate(translate[0], translate[1]);
 
-            while (dlen--) {
-                var point = d[dlen];
-                me.drawAlpha(point.x, point.y);
+        this.set_data = function set_data(obj) {
+            var ctx = this.canvas.getContext("2d");
+            ctx.shadowColor = ('rgba(0,0,0,0.1)');
+            ctx.shadowOffsetX = 15000;
+            ctx.shadowOffsetY = 15000;
+            ctx.shadowBlur = 15;
+
+            var len = obj.length;
+            while (len--) {
+                var point = obj[len];
+                ctx.beginPath();
+                ctx.arc(
+                    point.x - 15000,
+                    point.y - 15000,
+                    this.radius, 0,
+                    Math.PI*2,
+                    true);
+                ctx.closePath();
+                ctx.fill();
             }
-            me.colorize();
-        },
-        colorize: function() {
-            var me = this;
-            var canvas = me.get("canvas");
-            var ctx = canvas.getContext("2d");
-            var palette = me.get("gradient");
-            var opacity = me.get("opacity");
-            var image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        };
+
+        this.colorize = function colorize() {
+            var ctx = this.canvas.getContext("2d");
+            var image = ctx.getImageData(
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height);
             var alpha, offset, finalAlpha;
 
             for(var i=0; i < image.data.length; i+=4){
@@ -101,32 +97,16 @@ heat = function() {
                 if (!offset)
                     continue;
 
-                image.data[i] = palette[offset];
-                image.data[i+1] = palette[offset+1];
-                image.data[i+2] = palette[offset+2];
+                image.data[i] = this.gradient[offset];
+                image.data[i+1] = this.gradient[offset+1];
+                image.data[i+2] = this.gradient[offset+2];
 
-                finalAlpha = (alpha < opacity) ? alpha : opacity;
+                finalAlpha = (alpha < this.opacity) ? alpha : this.opacity;
                 image.data[i+3] = finalAlpha;
             }
             ctx.putImageData(image, 0, 0);
-        },
-        drawAlpha: function(x, y){
-            var me = this;
-            var canvas = me.get("canvas");
-            var ctx = canvas.getContext("2d");
-            var radius = me.get("radius");
-
-            ctx.shadowColor = ('rgba(0,0,0,0.1)');
-
-            ctx.shadowOffsetX = 15000;
-            ctx.shadowOffsetY = 15000;
-            ctx.shadowBlur = 15;
-
-            ctx.beginPath();
-            ctx.arc(x - 15000, y - 15000, radius, 0, Math.PI*2, true);
-            ctx.closePath();
-            ctx.fill();
-        }
+        };
+        return this;
     };
 
     heat.create = function(config) {

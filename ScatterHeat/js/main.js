@@ -64,18 +64,6 @@ var heat_map_canvas = d3.select("#scatterplot")
 
 var heat_cfg = {
     canvas: heat_map_canvas[0][0],
-    radius: 3,
-    gradient: {
-        0.00: "darkslategray",
-        0.25: "blue",
-        0.45: "lime",
-        0.60: "yellow",
-        0.75: "orange",
-        0.85: "coral",
-        0.90: "red",
-        0.95: "darkred",
-        0.98: "maroon"
-    },
     translate: [margin.left, margin.top]
 };
 
@@ -121,24 +109,21 @@ d3.csv("example.csv", function(error, data) {
     y_axis.call(d3.svg.axis().scale(y_scale).orient("left"));
 
     // Plot the data points in the canvas & calculate density
-    var data_density = [];
+    var heat_map_data = [];
     var dx, dy;
     data.forEach(function (d) {
         dx = x_scale_canvas(d[x_cat]);
         dy = y_scale_canvas(d[y_cat]);
 
-        ctx.fillStyle = "#888888"; //"#466d9f";
+        ctx.fillStyle = "#888888";
         ctx.globalAlpha = 0.5;
         ctx.beginPath();
         ctx.arc(dx, dy, 1, 0, 2*Math.PI);
         ctx.fill();
 
-        data_density.push({x:dx, y:dy})
+        heat_map_data.push({x:dx, y:dy})
     });
 
-    var heat_map_data = {
-        data: data_density
-    };
-
-    heat_map.setDataSet(heat_map_data);
+    heat_map.set_data(heat_map_data);
+    heat_map.colorize();
 });
