@@ -53,7 +53,7 @@ var tooltip = d3.select("body")
     .style("visibility", "hidden");
 
 // load the CSV and save the data
-d3.csv("../986d883313.csv", function(error, data) {
+d3.csv("986d883313.csv", function(error, data) {
     flow_data = data;
 
     // Grab our column names while we're here
