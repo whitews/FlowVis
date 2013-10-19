@@ -52,13 +52,3 @@ canvas {
     left: 0;
     top: 0;
 }
-
-#heatmap > canvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 680;
-    height: 580;
-    margin: 0;
-    padding: 0;
-}

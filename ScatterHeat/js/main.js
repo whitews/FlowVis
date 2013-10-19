@@ -13,6 +13,8 @@ var x_range;              // used for "auto-range" for chosen x category
 var y_range;              // used for "auto-range" for chosen x category
 var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
+var x_scale_canvas;       // function to convert x data to canvas pixels
+var y_scale_canvas;       // function to convert y data to canvas pixels
 var parameter_list = [];  // flow data column names
 
 var svg = d3.select("#scatterplot")
@@ -22,12 +24,11 @@ var svg = d3.select("#scatterplot")
 
 var canvas = d3.select("#scatterplot")
     .append("canvas")
-    .attr("width" , width)
-    .attr("height" , height);
+    .attr("width", width)
+    .attr("height", height);
 
 var ctx = canvas[0][0].getContext('2d');
-ctx.strokeStyle = "rgba(0,0,0,0.8)";
-ctx.lineWidth = "1.5";
+ctx.translate(margin.left, margin.top);
 
 var plot_area = svg.append("g")
     .attr("id", "plot-area")
@@ -56,23 +57,29 @@ var tooltip = d3.select("body")
     .style("visibility", "hidden");
 
 // Heat map stuff
+var heat_map_canvas = d3.select("#scatterplot")
+    .append("canvas")
+    .attr("width", width)
+    .attr("height", height);
+
 var heat_cfg = {
-    element: $("#heatmap")[0],
+    canvas: heat_map_canvas[0][0],
     radius: 3,
-    opacity: 110,
     gradient: {
         0.00: "darkslategray",
         0.25: "blue",
         0.45: "lime",
-        0.65: "yellow",
-        0.80: "orange",
-        0.90: "coral",
-        0.95: "red"},
-    width: width,
-    height: height
+        0.60: "yellow",
+        0.75: "orange",
+        0.85: "coral",
+        0.90: "red",
+        0.95: "darkred",
+        0.98: "maroon"
+    },
+    translate: [margin.left, margin.top]
 };
 
-var heat_map = h337.create(heat_cfg);
+var heat_map = heat.create(heat_cfg);
 
 // load the CSV data
 d3.csv("example.csv", function(error, data) {
@@ -117,8 +124,8 @@ d3.csv("example.csv", function(error, data) {
     var data_density = [];
     var dx, dy;
     data.forEach(function (d) {
-        dx = x_scale_canvas(d[x_cat])
-        dy = y_scale_canvas(d[y_cat])
+        dx = x_scale_canvas(d[x_cat]);
+        dy = y_scale_canvas(d[y_cat]);
 
         ctx.fillStyle = "#888888"; //"#466d9f";
         ctx.globalAlpha = 0.5;
@@ -126,14 +133,12 @@ d3.csv("example.csv", function(error, data) {
         ctx.arc(dx, dy, 1, 0, 2*Math.PI);
         ctx.fill();
 
-        data_density.push({x:Math.round(dx), y:Math.round(dy), count:1})
+        data_density.push({x:dx, y:dy})
     });
 
     var heat_map_data = {
-        max: 6,
         data: data_density
     };
 
-    heat_map.store.setDataSet(heat_map_data);
-
+    heat_map.setDataSet(heat_map_data);
 });
