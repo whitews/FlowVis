@@ -13,22 +13,21 @@ heat = function() {
     var heat = {};
 
     var default_gradient = {
-        0.00: "powderblue",
-        0.25: "blue",
-        0.45: "lime",
-        0.60: "yellow",
-        0.75: "orange",
-        0.85: "coral",
-        0.90: "red",
-        0.95: "maroon",
-        0.98: "rgb(64,0,0)",
-        1.00: "black"
+        0.00: "whitesmoke",
+        0.20: "blue",
+        0.40: "springgreen",
+        0.60: "lime",
+        0.75: "yellow",
+        0.85: "orange",
+        0.93: "red",
+        0.97: "maroon",
+        0.99: "black"
     };
 
     var heat_map = function heat_map(config) {
-        this.radius = config.radius || 5;
+        this.radius = config.radius || 3;
         this.gradient = config.gradient || default_gradient;
-        this.opacity = config.opacity || 180;
+        this.opacity = config.opacity || 255;
         this.canvas = config.canvas;
 
         var translate = config.translate || [0,0];
@@ -40,7 +39,7 @@ heat = function() {
         this.canvas.height = 256;
         var grad = ctx.createLinearGradient(0,0,1,256);
 
-        for(var x in this.gradient) {
+        for (var x in this.gradient) {
             if (this.gradient.hasOwnProperty(x)) {
                 grad.addColorStop(Number(x), this.gradient[x]);
             }
@@ -59,10 +58,9 @@ heat = function() {
 
         this.set_data = function set_data(obj) {
             var ctx = this.canvas.getContext("2d");
-            ctx.shadowColor = ('rgba(0,0,0,0.1)');
+            ctx.shadowColor = ('rgba(0,0,0,0.05)');
             ctx.shadowOffsetX = 15000;
             ctx.shadowOffsetY = 15000;
-            ctx.shadowBlur = 15;
 
             var len = obj.length;
             while (len--) {
@@ -71,8 +69,8 @@ heat = function() {
                 ctx.arc(
                     point.x - 15000,
                     point.y - 15000,
-                    this.radius, 0,
-                    Math.PI*2,
+                    this.radius,
+                    0, Math.PI*2,
                     true);
                 ctx.closePath();
                 ctx.fill();
@@ -82,34 +80,30 @@ heat = function() {
         this.colorize = function colorize() {
             var ctx = this.canvas.getContext("2d");
             var image = ctx.getImageData(
-                0,
-                0,
+                0, 0,
                 this.canvas.width,
                 this.canvas.height);
-            var alpha, offset, finalAlpha;
 
-            for(var i=0; i < image.data.length; i+=4){
+            for (var i=0; i < image.data.length; i+=4) {
 
                 // [0] -> r, [1] -> g, [2] -> b, [3] -> alpha
-                alpha = image.data[i+3];
-                offset = alpha*4;
+                var alpha = image.data[i+3];
+                var offset = alpha*4;
 
                 if (!offset)
                     continue;
 
-                image.data[i] = this.gradient[offset];
+                image.data[i]   = this.gradient[offset];
                 image.data[i+1] = this.gradient[offset+1];
                 image.data[i+2] = this.gradient[offset+2];
-
-                finalAlpha = (alpha < this.opacity) ? alpha : this.opacity;
-                image.data[i+3] = finalAlpha;
+                image.data[i+3] = (alpha < this.opacity) ? alpha : this.opacity;
             }
             ctx.putImageData(image, 0, 0);
         };
         return this;
     };
 
-    heat.create = function(config) {
+    heat.create = function (config) {
         return new heat_map(config);
     };
 
