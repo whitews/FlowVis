@@ -102,8 +102,8 @@ d3.csv("example.csv", function(error, data) {
     var heat_map_data = [];
     var dx, dy;
     data.forEach(function (d) {
-        dx = x_scale_canvas(d[x_cat]);
-        dy = y_scale_canvas(d[y_cat]);
+        dx = x_scale(d[x_cat]);
+        dy = y_scale(d[y_cat]);
 
         ctx.strokeStyle = "#0055dd";
         ctx.lineWidth = 1;
