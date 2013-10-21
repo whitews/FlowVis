@@ -105,9 +105,9 @@ d3.csv("example.csv", function(error, data) {
         dx = x_scale(d[x_cat]);
         dy = y_scale(d[y_cat]);
 
-        ctx.strokeStyle = "#0055dd";
+        ctx.strokeStyle = "rgba(0, 85, 221, 0.8)";
         ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.75;
+        ctx.globalAlpha = 1;
         ctx.beginPath();
         ctx.arc(dx, dy, 1.5, 0, 2*Math.PI, false);
         ctx.stroke();
