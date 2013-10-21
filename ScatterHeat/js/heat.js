@@ -13,7 +13,7 @@ heat = function() {
     var heat = {};
 
     var default_gradient = {
-        0.00: "whitesmoke",
+        0.10: "whitesmoke",
         0.20: "blue",
         0.40: "springgreen",
         0.60: "lime",
@@ -58,17 +58,15 @@ heat = function() {
 
         this.set_data = function set_data(obj) {
             var ctx = this.canvas.getContext("2d");
-            ctx.shadowColor = ('rgba(0,0,0,0.05)');
-            ctx.shadowOffsetX = 15000;
-            ctx.shadowOffsetY = 15000;
+            ctx.fillStyle = ('rgba(0,0,0,0.05)');
 
             var len = obj.length;
             while (len--) {
                 var point = obj[len];
                 ctx.beginPath();
                 ctx.arc(
-                    point.x - 15000,
-                    point.y - 15000,
+                    point.x,
+                    point.y,
                     this.radius,
                     0, Math.PI*2,
                     true);
