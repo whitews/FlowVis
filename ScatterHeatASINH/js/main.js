@@ -70,12 +70,15 @@ var heat_cfg = {
 var heat_map = heat.create(heat_cfg);
 
 function asinh(number) {
-    number = number * 0.001;
     return Math.log(number + Math.sqrt(number * number + 1));
 }
 
 // load the CSV data
-d3.csv("example.csv", function(error, data) {
+d3.csv("example_cd3_cd4.csv", function(error, data) {
+    var subsample_count = 10000;
+    var transform_scale = 0.001;
+
+
     // Grab our column names
     for (var key in data[0]) {
         if (key != "category") {
@@ -91,15 +94,21 @@ d3.csv("example.csv", function(error, data) {
     x_label.text(x_cat);
     y_label.text(y_cat);
 
-    // Transform data by asinh
+    // Transform data by asinh, but scale down first
     for (var i = 0, len = data.length; i < len; i++) {
-        data[i][x_cat] = asinh(data[i][x_cat]);
-        data[i][y_cat] = asinh(data[i][y_cat]);
+        data[i][x_cat] = asinh(data[i][x_cat] * transform_scale);
+        data[i][y_cat] = asinh(data[i][y_cat] * transform_scale);
     }
 
     // Get the new ranges to calculate the axes' scaling
-    x_range = d3.extent(data, function(d) { return parseFloat(d[x_cat]);});
-    y_range = d3.extent(data, function(d) { return parseFloat(d[y_cat]);});
+    x_range = d3.extent(data.slice(0, subsample_count), function(d) {
+        return parseFloat(d[x_cat]);
+    });
+    y_range = d3.extent(data.slice(0, subsample_count), function(d) {
+        return parseFloat(d[y_cat]);
+    });
+    x_range[1] = x_range[1] - 2;
+    y_range = x_range;
 
     // Update scaling functions for determining placement of the x and y axes
     x_scale = d3.scale.linear().domain(x_range).range([0, width-margin.left-margin.right]);
@@ -112,9 +121,9 @@ d3.csv("example.csv", function(error, data) {
     // Plot the data points in the canvas & calculate density
     var heat_map_data = [];
     var dx, dy;
-    data.forEach(function (d) {
-        dx = x_scale(d[x_cat]);
-        dy = y_scale(d[y_cat]);
+    for (var i = 0; i < subsample_count; i++) {
+        dx = x_scale(data[i][x_cat]);
+        dy = y_scale(data[i][y_cat]);
 
         ctx.strokeStyle = "rgba(0, 85, 221, 0.8)";
         ctx.lineWidth = 1;
@@ -124,7 +133,8 @@ d3.csv("example.csv", function(error, data) {
         ctx.stroke();
 
         heat_map_data.push({x:dx, y:dy})
-    });
+    }
+
 
     heat_map.set_data(heat_map_data);
     heat_map.colorize();
