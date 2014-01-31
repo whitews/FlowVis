@@ -70,7 +70,7 @@ var heat_cfg = {
 var heat_map = heat.create(heat_cfg);
 
 // load the CSV data
-d3.csv("example.csv", function(error, data) {
+d3.csv("example_cd3_cd4.csv", function(error, data) {
     // Grab our column names
     for (var key in data[0]) {
         if (key != "category") {
@@ -87,8 +87,8 @@ d3.csv("example.csv", function(error, data) {
     y_label.text(y_cat);
 
     // Get the new ranges to calculate the axes' scaling
-    x_range = d3.extent(data, function(d) { return parseInt(d[x_cat]);});
-    y_range = d3.extent(data, function(d) { return parseInt(d[y_cat]);});
+    x_range = d3.extent(data, function(d) { return parseFloat(d[x_cat]);});
+    y_range = d3.extent(data, function(d) { return parseFloat(d[y_cat]);});
 
     // Update scaling functions for determining placement of the x and y axes
     x_scale = d3.scale.linear().domain(x_range).range([0, width-margin.left-margin.right]);
