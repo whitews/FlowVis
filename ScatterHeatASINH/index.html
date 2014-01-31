@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>FlowVis</title>
+  <link rel="stylesheet" type="text/css" media="all" href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="js/heat.js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div id="title">Scatterplot + Heat Map + asinh</div>
+    </div>
+
+    <div class="row">
+      <div class="span9" id="scatterplot">
+      </div>
+      <div class="span3" id="instructions">
+        <p>
+          A scatterplot with an overlayed heat map of 10,000 points
+          using an HTML5 Canvas. Data has been transformed by asinx(0.001 * x)
+          to simulate the bi-exponential 'logicle' function.
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>
