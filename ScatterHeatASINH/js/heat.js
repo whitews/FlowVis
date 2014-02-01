@@ -13,14 +13,12 @@ heat = function() {
     var heat = {};
 
     var default_gradient = {
-        0.10: "whitesmoke",
         0.20: "blue",
-        0.40: "springgreen",
-        0.60: "lime",
-        0.75: "yellow",
-        0.85: "orange",
-        0.93: "red",
-        0.97: "maroon",
+        0.40: "green",
+        0.50: "lime",
+        0.70: "yellow",
+        0.80: "yellow",
+        0.90: "orangered",
         0.99: "black"
     };
 

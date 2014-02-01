@@ -75,7 +75,7 @@ function asinh(number) {
 
 // load the CSV data
 d3.csv("example_cd3_cd4.csv", function(error, data) {
-    var subsample_count = 10000;
+    var subsample_count = 15000;
     var transform_scale = 0.001;
 
 
@@ -125,7 +125,7 @@ d3.csv("example_cd3_cd4.csv", function(error, data) {
         dx = x_scale(data[i][x_cat]);
         dy = y_scale(data[i][y_cat]);
 
-        ctx.strokeStyle = "rgba(0, 85, 221, 0.8)";
+        ctx.strokeStyle = "rgba(96, 96, 212, 1.0)";
         ctx.lineWidth = 1;
         ctx.globalAlpha = 1;
         ctx.beginPath();
