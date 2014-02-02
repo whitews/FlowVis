@@ -105,7 +105,7 @@ d3.csv("example_cd3_cd4.csv", function(error, data) {
         dx = x_scale(d[x_cat]);
         dy = y_scale(d[y_cat]);
 
-        ctx.strokeStyle = "rgba(0, 85, 221, 0.8)";
+        ctx.strokeStyle = "rgba(96, 96, 212, 1.0)";
         ctx.lineWidth = 1;
         ctx.globalAlpha = 1;
         ctx.beginPath();

@@ -13,6 +13,8 @@ var x_range;              // used for "auto-range" for chosen x category
 var y_range;              // used for "auto-range" for chosen x category
 var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
+var x_scale_canvas;       // function to convert x data to canvas pixels
+var y_scale_canvas;       // function to convert y data to canvas pixels
 var parameter_list = [];  // flow data column names
 
 var svg = d3.select("#scatterplot")
@@ -22,12 +24,11 @@ var svg = d3.select("#scatterplot")
 
 var canvas = d3.select("#scatterplot")
     .append("canvas")
-    .attr("width" , width)
-    .attr("height" , height);
+    .attr("width", width)
+    .attr("height", height);
 
 var ctx = canvas[0][0].getContext('2d');
-ctx.strokeStyle = "rgba(0,0,0,0.8)";
-ctx.lineWidth = "1.5";
+ctx.translate(margin.left, height-margin.bottom);
 
 var plot_area = svg.append("g")
     .attr("id", "plot-area")
@@ -73,22 +74,12 @@ d3.csv("example.csv", function(error, data) {
     y_label.text(y_cat);
 
     // Get the new ranges to calculate the axes' scaling
-    x_range = d3.extent(data, function(d) { return parseInt(d[x_cat]);});
-    y_range = d3.extent(data, function(d) { return parseInt(d[y_cat]);});
-
-    // Pad ranges by 5% so the points aren't right on the edge
-    x_range[0] = Math.round(x_range[0]*.90);
-    x_range[1] = Math.round(x_range[1]*1.02);
-    y_range[0] = Math.round(y_range[0]*.90);
-    y_range[1] = Math.round(y_range[1]*1.02);
+    x_range = d3.extent(data, function(d) { return parseFloat(d[x_cat]);});
+    y_range = d3.extent(data, function(d) { return parseFloat(d[y_cat]);});
 
     // Update scaling functions for determining placement of the x and y axes
     x_scale = d3.scale.linear().domain(x_range).range([0, width-margin.left-margin.right]);
     y_scale = d3.scale.linear().domain(y_range).range([0, -(height-margin.top-margin.bottom)]);
-
-    // Canvas scaling function is a bit different...origin different???
-    x_scale_canvas = d3.scale.linear().domain(x_range).range([margin.left, width-margin.right]);
-    y_scale_canvas = d3.scale.linear().domain(y_range).range([(height-margin.bottom), margin.top]);
 
     // Update axes with the proper scaling
     x_axis.call(d3.svg.axis().scale(x_scale).orient("bottom"));
@@ -96,14 +87,14 @@ d3.csv("example.csv", function(error, data) {
 
     // Plot the data points in the canvas
     data.forEach(function (d) {
-        ctx.fillStyle = "#466d9f";
+        dx = x_scale(d[x_cat]);
+        dy = y_scale(d[y_cat]);
+
+        ctx.strokeStyle = "rgba(96, 96, 212, 1.0)";
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 1;
         ctx.beginPath();
-        ctx.arc(
-            x_scale_canvas(d[x_cat]),
-            y_scale_canvas(d[y_cat]),
-            1,
-            0,
-            2*Math.PI);
-        ctx.fill();
+        ctx.arc(dx, dy, 1.5, 0, 2*Math.PI, false);
+        ctx.stroke();
     })
 });
