@@ -6,7 +6,6 @@ var margin = {            // used mainly for padding the axes' labels
     bottom: 40,
     left: 80
 };
-var radius = 1;           // circle radius for plotted points
 var x_cat;                // chosen plot parameter for x-axis
 var y_cat;                // chosen plot parameter for y-axis
 var x_transform;          // chosen transform for x-data
