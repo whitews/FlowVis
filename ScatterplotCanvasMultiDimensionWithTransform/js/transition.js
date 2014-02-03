@@ -10,7 +10,6 @@ var x_cat;                // chosen plot parameter for x-axis
 var y_cat;                // chosen plot parameter for y-axis
 var x_transform;          // chosen transform for x-data
 var y_transform;          // chosen transform for y-data
-var show_heat = false;    // whether to show heat map
 var x_pre_scale;          // pre-scale factor for x data
 var y_pre_scale;          // pre-scale factor for y data
 var x_data;               // x data series to plot
@@ -90,26 +89,11 @@ d3.csv("example_fcs_data.csv", function(error, data) {
     }
 
     // render initial data points
-    prev_position = flow_data.map(position);
+    prev_position = flow_data.map(function (d) { return ['0','0',"rgba(96, 96, 212, 0.8)"]; });
     prev_position.forEach(circle);
 
     plot();
 });
-
-// Heat map stuff
-var heat_map_canvas = d3.select("#scatterplot")
-    .append("canvas")
-    .attr("width", width)
-    .attr("height", height);
-
-var heat_map_ctx = heat_map_canvas[0][0].getContext('2d');
-
-var heat_cfg = {
-    canvas: heat_map_canvas[0][0],
-    translate: [margin.left, height-margin.bottom]
-};
-
-var heat_map = heat.create(heat_cfg);
 
 function asinh(number) {
     return Math.log(number + Math.sqrt(number * number + 1));
@@ -127,9 +111,6 @@ function plot() {
     // Get user pre-scale value
     x_pre_scale = parseFloat($("#x_scale_select").val());
     y_pre_scale = parseFloat($("#y_scale_select").val());
-
-    // Determine whether user wants to see the heat map
-    show_heat = $("#heat_map_checkbox").is(':checked');
 
     // Update the axes' labels with the new categories
     x_label.text(x_cat);
@@ -162,6 +143,10 @@ function plot() {
         }
     }
 
+    transition(++transition_count);
+}
+
+function transition(count) {
     // Get the new ranges to calculate the axes' scaling
     x_range = d3.extent(x_data, function(d) { return parseFloat(d);});
     y_range = d3.extent(y_data, function(d) { return parseFloat(d);});
@@ -174,80 +159,47 @@ function plot() {
     x_axis.call(d3.svg.axis().scale(x_scale).orient("bottom"));
     y_axis.call(d3.svg.axis().scale(y_scale).orient("left"));
 
-    // Clear canvas
-    // Use the identity matrix while clearing the canvas
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.restore();
+    // calculate next positions
+    var next_position = [];
+    for (var i = 0, len = flow_data.length; i < len; i++) {
+        var x = x_scale(x_data[i]);
+        var y = y_scale(y_data[i]);
+        var color = "rgba(96, 96, 212, 0.8)";
 
-    // Clear heat map canvas
-    // Use the identity matrix while clearing the canvas
-    heat_map_ctx.save();
-    heat_map_ctx.setTransform(1, 0, 0, 1, 0, 0);
-    heat_map_ctx.clearRect(
-        0, 0, heat_map_ctx.canvas.width, heat_map_ctx.canvas.height);
-    heat_map_ctx.restore();
-
-    // Plot the data points in the canvas
-    var heat_map_data = [];
-    for (var i = 0; i < flow_data.length; i++) {
-        dx = x_scale(x_data[i]);
-        dy = y_scale(y_data[i]);
-
-        ctx.strokeStyle = "rgba(96, 96, 212, 1.0)";
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = 1;
-        ctx.beginPath();
-        ctx.arc(dx, dy, 1.5, 0, 2*Math.PI, false);
-        ctx.stroke();
-
-        heat_map_data.push({x:dx, y:dy});
+        next_position.push([x, y, color]);
     }
-
-    transition(++transition_count);
-
-    if (show_heat) {
-        heat_map.set_data(heat_map_data);
-        heat_map.colorize();
-    }
-}
-
-function transition(count) {
-    // next positions
-    var next_position = flow_data.map(position);
 
     var transition = d3.interpolate(prev_position, next_position);
 
     // run transition
     d3.timer(function(t) {
+        // Clear canvas
+        // Use the identity matrix while clearing the canvas
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.restore();
 
         // abort old transition
         if (count < transition_count) return true;
 
-        if (t > 3000) {
+        if (t > 2000) {
             prev_position = next_position;
             prev_position.forEach(circle);
             return true
         }
 
-        prev_position = transition(t/3000);
+        prev_position = transition(t/2000);
         prev_position.forEach(circle);
     });
 }
 
-// from data point, return [x,y,color]
-function position(d) {
-  var x = x_scale(d[parameter_list[x_cat]]);
-  var y = y_scale(d[parameter_list[y_cat]]);
-  return [x,y,"rgba(212, 96, 96, 1.0)"];
-}
-
 // render circle [x,y,color]
 function circle(pos) {
-  ctx.strokeStyle = pos[2];
-  ctx.beginPath();
-  ctx.arc(pos[0],pos[1],2,0,2*Math.PI);
-  ctx.stroke();
+    ctx.strokeStyle = pos[2];
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.arc(pos[0], pos[1], 1.5, 0, 2*Math.PI, false);
+    ctx.stroke();
 }
