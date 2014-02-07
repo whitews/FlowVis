@@ -1,60 +1,57 @@
-var width  = 680;         // width of the svg element
+var width  = 620;         // width of the svg element
 var height = 580;         // height of the svg element
-var margin = {            // used mainly for padding the axes' labels
-    top: 10,
-    right: 20,
-    bottom: 40,
-    left: 80
+var canvas_width = 540;   // width of the canvas
+var canvas_height = 540;  // height of the canvas
+var margin = {            // used mainly for positioning the axes' labels
+    top: 0,
+    right: 0,
+    bottom: height - canvas_height,
+    left: width - canvas_width
 };
-var radius = 1;           // circle radius for plotted points
 var x_cat;                // chosen plot parameter for x-axis
 var y_cat;                // chosen plot parameter for y-axis
 var x_range;              // used for "auto-range" for chosen x category
 var y_range;              // used for "auto-range" for chosen x category
 var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
-var x_scale_canvas;       // function to convert x data to canvas pixels
-var y_scale_canvas;       // function to convert y data to canvas pixels
 var parameter_list = [];  // flow data column names
+var radius = 1.5;
 
 var svg = d3.select("#scatterplot")
     .append("svg")
     .attr("width" , width)
     .attr("height" , height);
 
-var canvas = d3.select("#scatterplot")
+// create canvas for plot, it'll just be square as the axes will be drawn
+// using svg...will have a top and right margin though
+d3.select("#scatterplot")
     .append("canvas")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("id", "canvas_plot")
+    .attr("width", canvas_width)
+    .attr("height", canvas_height);
 
-var ctx = canvas[0][0].getContext('2d');
-ctx.translate(margin.left, height-margin.bottom);
+var canvas = document.getElementById("canvas_plot");
+
+var ctx = canvas.getContext('2d');
 
 var plot_area = svg.append("g")
-    .attr("id", "plot-area")
-    .attr("transform", "translate(" + margin.left + ", " + (height - margin.bottom) + ")");
+    .attr("id", "plot-area");
 
 var x_axis = plot_area.append("g")
-    .attr("class", "axis");
+    .attr("class", "axis")
+    .attr("transform", "translate(" + margin.left + "," + canvas_height + ")");
 
 var y_axis = plot_area.append("g")
-    .attr("class", "axis");
+    .attr("class", "axis")
+    .attr("transform", "translate(" + margin.left + "," + 0 + ")");
 
 var x_label = svg.append("text")
     .attr("class", "axis-label")
-    .attr("transform", "translate(" + ((width+margin.right)/2) + "," + height + ")");
+    .attr("transform", "translate(" + (canvas_width/2 + margin.left) + "," + (height-3) + ")");
 
 var y_label = svg.append("text")
     .attr("class", "axis-label")
-    .attr("transform", "translate(" + margin.left/4 + "," + height/2 + ") rotate(-90)");
-
-// A tooltip for displaying the point's event values
-var tooltip = d3.select("body")
-    .append("div")
-    .attr("id", "tooltip")
-    .style("position", "absolute")
-    .style("z-index", "100")
-    .style("visibility", "hidden");
+    .attr("transform", "translate(" + margin.left/4 + "," + (canvas_height/2) + ") rotate(-90)");
 
 // load the CSV data
 d3.csv("../data/example.csv", function(error, data) {
@@ -77,9 +74,15 @@ d3.csv("../data/example.csv", function(error, data) {
     x_range = d3.extent(data, function(d) { return parseFloat(d[x_cat]);});
     y_range = d3.extent(data, function(d) { return parseFloat(d[y_cat]);});
 
+    // pad ranges a bit, keeps the data points from overlapping the plot's edge
+    x_range[0] = x_range[0] - (x_range[1] - x_range[0]) * 0.01
+    x_range[1] = x_range[1] + (x_range[1] - x_range[0]) * 0.01
+    y_range[0] = y_range[0] - (y_range[1] - y_range[0]) * 0.01
+    y_range[1] = y_range[1] + (y_range[1] - y_range[0]) * 0.01
+
     // Update scaling functions for determining placement of the x and y axes
-    x_scale = d3.scale.linear().domain(x_range).range([0, width-margin.left-margin.right]);
-    y_scale = d3.scale.linear().domain(y_range).range([0, -(height-margin.top-margin.bottom)]);
+    x_scale = d3.scale.linear().domain(x_range).range([0, canvas_width]);
+    y_scale = d3.scale.linear().domain(y_range).range([canvas_height, 0]);
 
     // Update axes with the proper scaling
     x_axis.call(d3.svg.axis().scale(x_scale).orient("bottom"));
@@ -94,7 +97,7 @@ d3.csv("../data/example.csv", function(error, data) {
         ctx.lineWidth = 1;
         ctx.globalAlpha = 1;
         ctx.beginPath();
-        ctx.arc(dx, dy, 1.5, 0, 2*Math.PI, false);
+        ctx.arc(dx, dy, radius, 0, 2*Math.PI, false);
         ctx.stroke();
     })
 });
