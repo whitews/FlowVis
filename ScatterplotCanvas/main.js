@@ -75,10 +75,10 @@ d3.csv("../data/example.csv", function(error, data) {
     y_range = d3.extent(data, function(d) { return parseFloat(d[y_cat]);});
 
     // pad ranges a bit, keeps the data points from overlapping the plot's edge
-    x_range[0] = x_range[0] - (x_range[1] - x_range[0]) * 0.01
-    x_range[1] = x_range[1] + (x_range[1] - x_range[0]) * 0.01
-    y_range[0] = y_range[0] - (y_range[1] - y_range[0]) * 0.01
-    y_range[1] = y_range[1] + (y_range[1] - y_range[0]) * 0.01
+    x_range[0] = x_range[0] - (x_range[1] - x_range[0]) * 0.01;
+    x_range[1] = x_range[1] + (x_range[1] - x_range[0]) * 0.01;
+    y_range[0] = y_range[0] - (y_range[1] - y_range[0]) * 0.01;
+    y_range[1] = y_range[1] + (y_range[1] - y_range[0]) * 0.01;
 
     // Update scaling functions for determining placement of the x and y axes
     x_scale = d3.scale.linear().domain(x_range).range([0, canvas_width]);
@@ -99,5 +99,5 @@ d3.csv("../data/example.csv", function(error, data) {
         ctx.beginPath();
         ctx.arc(dx, dy, radius, 0, 2*Math.PI, false);
         ctx.stroke();
-    })
+    });
 });

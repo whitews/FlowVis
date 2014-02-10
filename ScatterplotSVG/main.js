@@ -1,4 +1,4 @@
-var width  = 680;         // width of the svg element
+var width  = 620;         // width of the svg element
 var height = 580;         // height of the svg element
 var margin = {            // used mainly for padding the axes' labels
     top: 10,
@@ -6,14 +6,14 @@ var margin = {            // used mainly for padding the axes' labels
     bottom: 40,
     left: 80
 };
-var radius = 1;           // circle radius for plotted points
 var x_cat;                // chosen plot parameter for x-axis
 var y_cat;                // chosen plot parameter for y-axis
 var x_range;              // used for "auto-range" for chosen x category
-var y_range;              // used for "auto-range" for chosen x category
+var y_range;              // used for "auto-range" for chosen y category
 var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
 var parameter_list = [];  // flow data column names
+var radius = 1.5;
 
 var svg = d3.select("#scatterplot")
     .append("svg")
@@ -64,14 +64,14 @@ d3.csv("../data/example.csv", function(error, data) {
     y_label.text(y_cat);
 
     // Get the new ranges to calculate the axes' scaling
-    x_range = d3.extent(data, function(d) { return parseInt(d[x_cat]);});
-    y_range = d3.extent(data, function(d) { return parseInt(d[y_cat]);});
+    x_range = d3.extent(data, function(d) { return parseFloat(d[x_cat]);});
+    y_range = d3.extent(data, function(d) { return parseFloat(d[y_cat]);});
 
-    // Pad ranges by 5% so the points aren't right on the edge
-    x_range[0] = Math.round(x_range[0]*.90);
-    x_range[1] = Math.round(x_range[1]*1.02);
-    y_range[0] = Math.round(y_range[0]*.90);
-    y_range[1] = Math.round(y_range[1]*1.02);
+    // pad ranges a bit, keeps the data points from overlapping the plot's edge
+    x_range[0] = x_range[0] - (x_range[1] - x_range[0]) * 0.01;
+    x_range[1] = x_range[1] + (x_range[1] - x_range[0]) * 0.01;
+    y_range[0] = y_range[0] - (y_range[1] - y_range[0]) * 0.01;
+    y_range[1] = y_range[1] + (y_range[1] - y_range[0]) * 0.01;
 
     // Update scaling functions for determining placement of the x and y axes
     x_scale = d3.scale.linear().domain(x_range).range([0, width-margin.left-margin.right]);
