@@ -23,6 +23,8 @@ var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
 var flow_data;            // FCS data
 var parameter_list = [];  // flow data column names
+var radius = 1.5;
+var subsample_count = 15000;
 
 var svg = d3.select("#scatterplot")
     .append("svg")
@@ -84,7 +86,13 @@ function asinh(number) {
 
 // load the CSV data
 d3.csv("../data/example_fcs_data.csv", function(error, data) {
-    flow_data = data;
+    // Check if data length is shorter than our subsample count, if so
+    // reset the subsample count so we don't iterate out of bounds
+    if (data.length < subsample_count) {
+        flow_data = data;
+    } else {
+        flow_data = data.slice(0, subsample_count);
+    }
 
     // Grab our column names
     for (var key in data[0]) {
@@ -195,7 +203,7 @@ function plot() {
         ctx.lineWidth = 1;
         ctx.globalAlpha = 1;
         ctx.beginPath();
-        ctx.arc(dx, dy, 1.5, 0, 2*Math.PI, false);
+        ctx.arc(dx, dy, radius, 0, 2*Math.PI, false);
         ctx.stroke();
 
         heat_map_data.push({x:dx, y:dy});

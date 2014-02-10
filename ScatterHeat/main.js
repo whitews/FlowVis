@@ -11,11 +11,12 @@ var margin = {            // used mainly for positioning the axes' labels
 var x_cat;                // chosen plot parameter for x-axis
 var y_cat;                // chosen plot parameter for y-axis
 var x_range;              // used for "auto-range" for chosen x category
-var y_range;              // used for "auto-range" for chosen x category
+var y_range;              // used for "auto-range" for chosen y category
 var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
 var parameter_list = [];  // flow data column names
 var radius = 1.5;
+var subsample_count = 15000;
 
 var svg = d3.select("#scatterplot")
     .append("svg")
@@ -70,7 +71,11 @@ var heat_map = heat.create(heat_cfg);
 
 // load the CSV data
 d3.csv("../data/example_cd3_cd4.csv", function(error, data) {
-    var subsample_count = 15000;
+    // Check if data length is shorter than our subsample count, if so
+    // reset the subsample count so we don't iterate out of bounds
+    if (data.length < subsample_count) {
+        subsample_count = data.length;
+    }
 
     // Grab our column names
     for (var key in data[0]) {
@@ -123,7 +128,7 @@ d3.csv("../data/example_cd3_cd4.csv", function(error, data) {
         ctx.arc(dx, dy, radius, 0, 2*Math.PI, false);
         ctx.stroke();
 
-        heat_map_data.push({x:dx, y:dy})
+        heat_map_data.push({x:dx, y:dy});
     }
 
     heat_map.set_data(heat_map_data);

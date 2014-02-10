@@ -16,6 +16,8 @@ var x_scale;              // function to convert x data to svg pixels
 var y_scale;              // function to convert y data to svg pixels
 var parameter_list = [];  // flow data column names
 var radius = 1.5;
+var subsample_count = 15000;
+var transform_scale = 0.001;
 
 var svg = d3.select("#scatterplot")
     .append("svg")
@@ -74,8 +76,11 @@ function asinh(number) {
 
 // load the CSV data
 d3.csv("../data/example_cd3_cd4.csv", function(error, data) {
-    var subsample_count = 15000;
-    var transform_scale = 0.001;
+    // Check if data length is shorter than our subsample count, if so
+    // reset the subsample count so we don't iterate out of bounds
+    if (data.length < subsample_count) {
+        subsample_count = data.length;
+    }
 
     // Grab our column names
     for (var key in data[0]) {
@@ -105,8 +110,6 @@ d3.csv("../data/example_cd3_cd4.csv", function(error, data) {
     y_range = d3.extent(data.slice(0, subsample_count), function(d) {
         return parseFloat(d[y_cat]);
     });
-    x_range[1] = x_range[1] - 2;
-    y_range = x_range;
 
     // pad ranges a bit, keeps the data points from overlapping the plot's edge
     x_range[0] = x_range[0] - (x_range[1] - x_range[0]) * 0.01;
