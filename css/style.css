@@ -76,10 +76,9 @@ svg, canvas {
     top: 0;
     padding-top: 3px;
     padding-right: 3px;
-    border: 1px dotted;
 }
 
-circle {
+circle, ellipse {
     z-index: 100;
     fill: #99c3d1;
     stroke: #466d9f;
