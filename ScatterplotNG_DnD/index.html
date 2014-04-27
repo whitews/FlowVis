@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>FlowVis</title>
+  <link rel="stylesheet" type="text/css" media="all" href="../css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="../css/style.css">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.js"></script>
+  <script src="../../js/angular-file-upload-shim.js"></script>
+  <script src="../../js/angular-file-upload.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<body>
+
+  <div class="container" ng-app="ScatterplotApp" ng-controller="MainController">
+    <div class="row">
+      <div id="title">Scatterplot w/Draggable Files</div>
+    </div>
+
+    <div class="row">
+      <div class="span9" id="scatterplot">
+        <scatterplot data="scatterplot_data"></scatterplot>
+      </div>
+      <div class="span3" id="instructions">
+        <p>
+          A scatterplot with draggable FCS files
+        </p>
+        <div class="drop-box" ng-show="dropSupported" ng-file-drop="onFileSelect($files);" ng-file-drop-available="dropSupported=true">
+          <h3 class="text-center instruction"><em>Drop file here</em></h3>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+  <script src="directives/scatter.js"></script>
+  <script src="controllers/main_controller.js"></script>
+
+</body>
+
+</html>

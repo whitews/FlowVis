@@ -6,36 +6,35 @@
   <link rel="stylesheet" type="text/css" media="all" href="../css/bootstrap.css">
   <link rel="stylesheet" type="text/css" href="../css/style.css">
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.js"></script>
   <script src="http://d3js.org/d3.v3.min.js"></script>
 </head>
 
 <body>
 
-  <div class="container">
+  <div class="container" ng-app="ScatterplotApp" ng-controller="MainController">
     <div class="row">
-      <div id="title">Simple Radar Chart</div>
+      <div id="title">Scatterplot (D3 + Angular)</div>
     </div>
 
     <div class="row">
-      <span class="offset1 span3">
-      </span>
-      <span class="span3">
-      </span>
-      <span class="span2">
-      </span>
-    </div>
-
-    <div class="row">
-      <div class="span9" id="radarchart"></div>
+      <div class="span9" id="scatterplot">
+        <scatterplot data="scatterplot_data"></scatterplot>
+      </div>
       <div class="span3" id="instructions">
         <p>
-          A simple radar chart (also called a star plot).
+          A scatterplot using Angular JS
         </p>
+
+
       </div>
     </div>
 
   </div>
-  <script src="main.js"></script>
+
+  <script src="app.js"></script>
+  <script src="directives/scatter.js"></script>
+  <script src="controllers/main_controller.js"></script>
 
 </body>
 
