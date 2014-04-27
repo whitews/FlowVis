@@ -26,7 +26,7 @@ app.controller(
                 obj.data_end = parseInt(preheader.substr(34, 8));
 
                 parseFcsText(obj);
-                parseFcsData(obj);
+
             });
             var blob = obj.file.slice(0, 58);
             reader.readAsBinaryString(blob);
@@ -130,19 +130,10 @@ app.controller(
                     }
                 }
 
-                // Using $apply here to trigger template update
-                $scope.$apply(function () {
-                    $scope.fcs_file = obj;
-                });
-            });
+                // save obj to scope so it's available to parse data section
+                $scope.fcs_file = obj;
 
-            var blob = obj.file.slice(obj.text_begin, obj.text_end);
-            reader.readAsBinaryString(blob);
-        }
-
-        function parseFcsData(obj) {
-            var reader = new FileReader();
-            reader.addEventListener("loadend", function(evt) {
+                // Finally, save binary parsing info for easier access
                 var tot_result = $scope.fcs_file.metadata.filter(
                     function(d) {
                         if (d.key === '$TOT') {
@@ -151,11 +142,95 @@ app.controller(
                     }
                 );
                 $scope.fcs_file.event_count = tot_result[0].value.trim();
-                console.log($scope.fcs_file.event_count);
+
+                // verify list mode
+                var mode_result = $scope.fcs_file.metadata.filter(
+                    function(d) {
+                        if (d.key === '$MODE') {
+                            return d
+                        }
+                    }
+                );
+                $scope.fcs_file.mode = mode_result[0].value.trim();
+                if (!$scope.fcs_file.mode == "L") {
+                    return;
+                }
+
+                // check byte order
+                var byte_order_result = $scope.fcs_file.metadata.filter(
+                    function(d) {
+                        if (d.key === '$BYTEORD') {
+                            return d
+                        }
+                    }
+                );
+                $scope.fcs_file.byte_order = byte_order_result[0].value.trim();
+                if ($scope.fcs_file.byte_order[0] === "1") {
+                    $scope.fcs_file.little_endian = true;
+                } else {
+                    $scope.fcs_file.little_endian = false;
+                }
+
+                var event_bit_count = 0;
+                $scope.fcs_file.channels.forEach(function (channel) {
+                    event_bit_count += +channel.pnb;
+                });
+                $scope.fcs_file.event_bit_count = event_bit_count;
+                parseFcsData(obj);
             });
 
-            var blob = obj.file.slice(obj.data_begin, obj.data_end);
+            var blob = obj.file.slice(obj.text_begin, obj.text_end);
             reader.readAsBinaryString(blob);
+        }
+
+        function parseFcsData(obj) {
+            // validate data segment length matches total events
+            var total_bytes = (obj.data_end - obj.data_begin + 1);
+            var event_bytes = ($scope.fcs_file.event_bit_count / 8);
+            if (total_bytes/ event_bytes != $scope.fcs_file.event_count) {
+                return;
+            }
+
+            var event_begin = null;
+            var event_end = null;
+            for (var i = 0; i < $scope.fcs_file.event_count; i++) {
+                event_begin = obj.data_begin + (event_bytes * i);
+                event_end = event_begin + event_bytes;
+                var blob = obj.file.slice(event_begin, event_end);
+
+                var reader = new FileReader();
+                reader.addEventListener("loadend", function(evt) {
+                    var event_data = [];
+                    var data_view = null;
+                    var byte_offset = 0;
+                    var value_length = null;  // in bytes
+                    var value = null;
+                    $scope.fcs_file.channels.forEach(function(channel) {
+                        value_length = parseInt(channel.pnb) / 8;
+                        data_view = new DataView(evt.target.result.slice(
+                            byte_offset,
+                            byte_offset + value_length)
+                        );
+                        value = data_view.getFloat32(
+                            0,
+                            $scope.fcs_file.little_endian
+                        );
+                        event_data.push(value);
+                        byte_offset = byte_offset + value_length;
+                    });
+
+                    $scope.fcs_file.event_data.push(event_data);
+
+                });
+                reader.readAsArrayBuffer(blob);
+            }
+        }
+
+        function swap32(val) {
+            return ((val & 0xFF) << 24)
+                   | ((val & 0xFF00) << 8)
+                   | ((val >> 8) & 0xFF00)
+                   | ((val >> 24) & 0xFF);
         }
 
         $scope.onFileSelect = function($files) {
@@ -169,7 +244,9 @@ app.controller(
                     date: "",
                     metadata: {},
                     selected: false,
-                    acquisition_date: null
+                    acquisition_date: null,
+                    event_bit_count: null,
+                    event_data: []
                 });
             }
         };
