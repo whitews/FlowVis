@@ -65,7 +65,7 @@ app.directive('scatterplot', function() {
                 }
             }
 
-            // Choose random x & y categories
+            // Choose 1st parameters for x & y categories
             x_cat = parameter_list[0];
             y_cat = parameter_list[1];
 
