@@ -196,47 +196,53 @@ app.controller(
                 return;
             }
 
-            var event_begin = null;
-            var event_end = null;
-            for (var i = 0; i < $scope.fcs_file.event_count; i++) {
-                if (i > 2000) {
+            var blob_begin = null;
+            var blob_end = null;
+
+            var chunk_size = 500;  // chunk size is in number of events
+            for (var i = 0; i < $scope.fcs_file.event_count; i = i + chunk_size) {
+                if (i > 10000) {
                     break;
                 }
 
-                event_begin = obj.data_begin + (event_bytes * i);
-                event_end = event_begin + event_bytes;
-                var blob = obj.file.slice(event_begin, event_end);
+                blob_begin = obj.data_begin + (event_bytes * i);
+                blob_end = blob_begin + (chunk_size * event_bytes);
+                var blob = obj.file.slice(blob_begin, blob_end);
 
                 var reader = new FileReader();
                 var update_scope = false;
-                if (i >= $scope.fcs_file.event_count - 1 || i >= 2000) {
+                if (i >= $scope.fcs_file.event_count - 1 || i >= 10000) {
                     update_scope = true
                 }
                 reader.onloadend = function (update_scope) {
                     return function(evt) {
-                        var event_data = [];
                         var data_view = null;
                         var byte_offset = 0;
                         var value_length = null;  // in bytes
                         var value = null;
 
-                        // add CSV data for this event
-                        $scope.fcs_file.channels.forEach(function(channel) {
-                            value_length = parseInt(channel.pnb) / 8;
-                            data_view = new DataView(evt.target.result.slice(
-                                byte_offset,
-                                byte_offset + value_length)
-                            );
-                            value = data_view.getFloat32(
-                                0,
-                                $scope.fcs_file.little_endian
-                            );
-                            event_data.push(value);
-                            byte_offset = byte_offset + value_length;
-                        });
+                        // iterate events in chunked blob
+                        for (var j = 0; j < chunk_size; j++) {
+                            var event_data = [];
 
-                        $scope.fcs_file.event_data += event_data.join(',');
-                        $scope.fcs_file.event_data += "\r\n";
+                            // add CSV data for this event
+                            $scope.fcs_file.channels.forEach(function(channel) {
+                                value_length = parseInt(channel.pnb) / 8;
+                                data_view = new DataView(evt.target.result.slice(
+                                    byte_offset,
+                                    byte_offset + value_length)
+                                );
+                                value = data_view.getFloat32(
+                                    0,
+                                    $scope.fcs_file.little_endian
+                                );
+                                event_data.push(value);
+                                byte_offset = byte_offset + value_length;
+                            });
+
+                            $scope.fcs_file.event_data += event_data.join(',');
+                            $scope.fcs_file.event_data += "\r\n";
+                        }
                         if (update_scope) {
                             $scope.$apply();
                         }
