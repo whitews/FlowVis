@@ -23,37 +23,42 @@ app.directive('scatterplot', function() {
             .attr("width" , width)
             .attr("height" , height);
 
-        var plot_area = svg.append("g")
+        // load the CSV data
+        scope.render = function (plot_data) {
+            if(!plot_data){ return; }
+
+            // remove previous stuff from SVG
+            svg.selectAll('*').remove();
+
+            // Now add back our new plot supporting elements
+            var plot_area = svg.append("g")
             .attr("id", "plot-area")
             .attr("transform", "translate(" + margin.left + ", " + (height - margin.bottom) + ")");
 
-        var x_axis = plot_area.append("g")
-            .attr("class", "axis");
+            var x_axis = plot_area.append("g")
+                .attr("class", "axis");
 
-        var y_axis = plot_area.append("g")
-            .attr("class", "axis");
+            var y_axis = plot_area.append("g")
+                .attr("class", "axis");
 
-        var x_label = svg.append("text")
-            .attr("class", "axis-label")
-            .attr("transform", "translate(" + ((width+margin.right)/2) + "," + height + ")");
+            var x_label = svg.append("text")
+                .attr("class", "axis-label")
+                .attr("transform", "translate(" + ((width+margin.right)/2) + "," + height + ")");
 
-        var y_label = svg.append("text")
-            .attr("class", "axis-label")
-            .attr("transform", "translate(" + margin.left/4 + "," + height/2 + ") rotate(-90)");
+            var y_label = svg.append("text")
+                .attr("class", "axis-label")
+                .attr("transform", "translate(" + margin.left/4 + "," + height/2 + ") rotate(-90)");
 
-        // A tooltip for displaying the point's event values
-        var tooltip = d3.select("body")
-            .append("div")
-            .attr("id", "tooltip")
-            .style("position", "absolute")
-            .style("z-index", "100")
-            .style("visibility", "hidden");
+            // A tooltip for displaying the point's event values
+            var tooltip = d3.select("body")
+                .append("div")
+                .attr("id", "tooltip")
+                .style("position", "absolute")
+                .style("z-index", "100")
+                .style("visibility", "hidden");
 
-        var circles = plot_area.selectAll('circle');
+            var circles = plot_area.selectAll('circle');
 
-        // load the CSV data
-        scope.$watch('data', function(plot_data) {
-            if(!plot_data){ return; }
             var data = d3.csv.parse(plot_data);
 
             // Grab our column names
@@ -97,11 +102,17 @@ app.directive('scatterplot', function() {
                     .attr("cx", function (d) { return x_scale(d[x_cat]); })
                     .attr("cy", function (d) { return y_scale(d[y_cat]); })
                     .attr("r", radius);
+        };
+
+        scope.$watch('data', function(plot_data) {
+            scope.render(plot_data);
         });
+
     }
     return {
         link: link,
         restrict: 'E',
+        replace: true,
         scope: { data: '='}
     };
 });

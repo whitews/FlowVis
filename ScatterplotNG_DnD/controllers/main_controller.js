@@ -178,7 +178,7 @@ app.controller(
                     param_string = channel.pnn + ' ' + channel.pns;
                     headers.push(param_string.trim());
                 });
-                $scope.fcs_file.event_data += headers.join(',');
+                $scope.fcs_file.event_data = headers.join(',');
                 $scope.fcs_file.event_data += '\r\n';
 
                 parseFcsData(obj);
@@ -199,7 +199,7 @@ app.controller(
             var event_begin = null;
             var event_end = null;
             for (var i = 0; i < $scope.fcs_file.event_count; i++) {
-                if (i > 10000) {
+                if (i > 2000) {
                     break;
                 }
 
@@ -209,7 +209,7 @@ app.controller(
 
                 var reader = new FileReader();
                 var update_scope = false;
-                if (i >= $scope.fcs_file.event_count - 1 || i >= 10000) {
+                if (i >= $scope.fcs_file.event_count - 1 || i >= 2000) {
                     update_scope = true
                 }
                 reader.onloadend = function (update_scope) {
