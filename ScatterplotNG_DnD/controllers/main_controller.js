@@ -201,8 +201,9 @@ app.controller(
             var blob_end = null;
 
             var chunk_size = 500;  // chunk size is in number of events
+            var subsample_count = 10000
             for (var i = 0; i < $scope.fcs_file.event_count; i = i + chunk_size) {
-                if (i > 10000) {
+                if (i > subsample_count) {
                     break;
                 }
 
@@ -212,7 +213,7 @@ app.controller(
 
                 var reader = new FileReader();
                 var update_scope = false;
-                if (i >= $scope.fcs_file.event_count - 1 || i >= 10000) {
+                if (i + chunk_size >= $scope.fcs_file.event_count - 1 || i >= subsample_count) {
                     update_scope = true
                 }
                 reader.onloadend = function (update_scope) {
