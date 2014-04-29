@@ -201,7 +201,7 @@ app.controller(
             var blob_end = null;
 
             var chunk_size = 500;  // chunk size is in number of events
-            var subsample_count = 10000
+            var subsample_count = 30000
             for (var i = 0; i < $scope.fcs_file.event_count; i = i + chunk_size) {
                 if (i > subsample_count) {
                     break;
@@ -218,24 +218,24 @@ app.controller(
                 }
                 reader.onloadend = function (update_scope) {
                     return function(evt) {
-                        var data_view = null;
                         var byte_offset = 0;
                         var value_length = null;  // in bytes
                         var value = null;
 
-                        // iterate events in chunked blob
+                        // create DataView to read events in chunked blob
+                        var data_view = new DataView(evt.target.result.slice(
+                                    byte_offset,
+                                    chunk_size * event_bytes)
+                                );
                         for (var j = 0; j < chunk_size; j++) {
                             var event_data = [];
 
                             // add CSV data for this event
                             $scope.fcs_file.channels.forEach(function(channel) {
                                 value_length = parseInt(channel.pnb) / 8;
-                                data_view = new DataView(evt.target.result.slice(
-                                    byte_offset,
-                                    byte_offset + value_length)
-                                );
+
                                 value = data_view.getFloat32(
-                                    0,
+                                    byte_offset,
                                     $scope.fcs_file.little_endian
                                 );
                                 event_data.push(value);
