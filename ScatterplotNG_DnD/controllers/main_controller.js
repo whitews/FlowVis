@@ -1,6 +1,7 @@
 app.controller(
     'MainController',
     ['$scope', '$http', function ($scope, $http) {
+        $scope.duration = 0;
         // file reader stuff
         $scope.fileReaderSupported = window.FileReader != null;
 
@@ -244,6 +245,9 @@ app.controller(
                             $scope.fcs_file.event_data += "\r\n";
                         }
                         if (update_scope) {
+                            end_time = new Date().getTime();
+                            $scope.duration = end_time - $scope.start_time;
+                            console.log($scope.duration);
                             $scope.$apply();
                         }
                     }
@@ -256,6 +260,7 @@ app.controller(
         $scope.onFileSelect = function($files) {
 
             for (var i = 0; i < $files.length; i++) {
+                $scope.start_time = new Date().getTime();
                 setupReader({
                     filename: $files[i].name,
                     file: $files[i],
