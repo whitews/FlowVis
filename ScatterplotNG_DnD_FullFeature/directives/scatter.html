@@ -1,0 +1,50 @@
+<div>
+  <div class="row">
+    <span class="offset1 span3">
+      X axis:<br/>
+      <select ng-model="x_cat" ng-options="p for p in parameter_list"></select><br/>
+      Transform:<br/>
+      <select id="x_transform_select">
+          <option value="lin">Linear</option>
+          <option value="asinh">Inverse Hyperbolic Sine</option>
+      </select><br/>
+      Pre-scale factor:<br/>
+      <select id="x_scale_select">
+          <option value="0.001">1 / 1000</option>
+          <option value="0.01">1 / 100</option>
+          <option value="0.1">1 / 10</option>
+          <option selected="selected" value="1">1</option>
+          <option value="10">10</option>
+          <option value="100">100</option>
+          <option value="1000">1000</option>
+      </select>
+    </span>
+    <span class="span3">
+      Y axis:<br/>
+      <select ng-model="y_cat" ng-options="p for p in parameter_list"></select><br/>
+      Transform:<br/>
+      <select id="y_transform_select">
+          <option value="lin">Linear</option>
+          <option value="asinh">Inverse Hyperbolic Sine</option>
+      </select><br/>
+      Pre-scale factor:<br/>
+      <select id="y_scale_select">
+          <option value="0.001">1 / 1000</option>
+          <option value="0.01">1 / 100</option>
+          <option value="0.1">1 / 10</option>
+          <option selected="selected" value="1">1</option>
+          <option value="10">10</option>
+          <option value="100">100</option>
+          <option value="1000">1000</option>
+      </select>
+    </span>
+    <span class="span2">
+      <br/>
+      <button class="btn btn-primary" ng-click="render_plot(plot_data)">Update Plot</button>
+      <br/><br/>
+      <input id="heat_map_checkbox" type="checkbox">Use heat map
+    </span>
+  </div>
+  <div id="plot" class="row"></div>
+</div>
+
