@@ -31,20 +31,22 @@ app.directive('scatterplot', function() {
         scope.prev_position = [];         // prev_position [x, y, color] pairs
         scope.transition_count = 0;       // used to cancel old transitions
 
-        scope.$watch('data', function(plot_data) {
-            if (!plot_data) {
+        scope.$watch('data', function(data) {
+            if (!data) {
                 return;
             }
 
+            data = d3.csv.parse(data);
+            scope.plot_data = data.slice(0, subsample_count);
+
             // Grab our column names
-            for (var key in plot_data[0]) {
+            for (var key in scope.plot_data[0]) {
                 if (key != "category") {
                     scope.parameter_list.push(key);
                 }
             }
 
-            var data = d3.csv.parse(plot_data);
-            scope.plot_data = data.slice(0, subsample_count);
+
 
             // render initial data points
             scope.prev_position = scope.plot_data.map(function (d) {
