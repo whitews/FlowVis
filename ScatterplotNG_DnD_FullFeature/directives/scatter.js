@@ -54,11 +54,11 @@ app.directive('scatterplot', function() {
             });
             scope.prev_position.forEach(scope.circle);
 
-            scope.plot();
+            scope.render_plot();
         });
 
         scope.svg = d3.select("#scatterplot")
-            .append("scope.svg")
+            .append("svg")
             .attr("width", width)
             .attr("height", height);
 
