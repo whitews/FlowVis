@@ -5,14 +5,6 @@ app.controller('ScatterController', ['$scope', function ($scope) {
     }
 
     $scope.render_plot = function () {
-        // Get user select transform
-        x_transform = $("#x_transform_select").val();
-        y_transform = $("#y_transform_select").val();
-
-        // Get user pre-scale value
-        x_pre_scale = parseFloat($("#x_scale_select").val());
-        y_pre_scale = parseFloat($("#y_scale_select").val());
-
         // Determine whether user wants to see the heat map
         show_heat = $("#heat_map_checkbox").is(':checked');
 
@@ -25,25 +17,25 @@ app.controller('ScatterController', ['$scope', function ($scope) {
 
         // Transform data by asinh, but scale down first
         for (var i = 0, len = $scope.plot_data.length; i < len; i++) {
-            switch (x_transform) {
+            switch ($scope.x_transform) {
                 case 'lin':
-                    x_data[i] = $scope.plot_data[i][$scope.x_cat] * x_pre_scale;
+                    x_data[i] = $scope.plot_data[i][$scope.x_cat] * $scope.x_pre_scale;
                     break;
                 case 'asinh':
-                    x_data[i] = asinh($scope.plot_data[i][$scope.x_cat] * x_pre_scale);
+                    x_data[i] = asinh($scope.plot_data[i][$scope.x_cat] * $scope.x_pre_scale);
                     break;
                 default:
-                    x_data[i] = $scope.plot_data[i][$scope.x_cat] * x_pre_scale;
+                    x_data[i] = $scope.plot_data[i][$scope.x_cat] * $scope.x_pre_scale;
             }
-            switch (y_transform) {
+            switch ($scope.y_transform) {
                 case 'lin':
-                    y_data[i] = $scope.plot_data[i][$scope.y_cat] * y_pre_scale;
+                    y_data[i] = $scope.plot_data[i][$scope.y_cat] * $scope.y_pre_scale;
                     break;
                 case 'asinh':
-                    y_data[i] = asinh($scope.plot_data[i][$scope.y_cat] * y_pre_scale);
+                    y_data[i] = asinh($scope.plot_data[i][$scope.y_cat] * $scope.y_pre_scale);
                     break;
                 default:
-                    y_data[i] = $scope.plot_data[i][$scope.y_cat] * y_pre_scale;
+                    y_data[i] = $scope.plot_data[i][$scope.y_cat] * $scope.y_pre_scale;
             }
         }
 
@@ -103,7 +95,7 @@ app.controller('ScatterController', ['$scope', function ($scope) {
                 $scope.prev_position = next_position;
                 $scope.prev_position.forEach($scope.circle);
 
-                if (show_heat) {
+                if ($scope.show_heat) {
                     $scope.heat_map_ctx.clearRect(
                         0,
                         0,

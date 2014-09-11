@@ -12,11 +12,11 @@ app.directive('scatterplot', function() {
         };
         scope.x_cat;                // chosen plot parameter for x-axis
         scope.y_cat;                // chosen plot parameter for y-axis
-        var x_transform;          // chosen transform for x-data
-        var y_transform;          // chosen transform for y-data
-        var show_heat = false;    // whether to show heat map
-        var x_pre_scale;          // pre-scale factor for x data
-        var y_pre_scale;          // pre-scale factor for y data
+        scope.x_transform;          // chosen transform for x-data
+        scope.y_transform;          // chosen transform for y-data
+        scope.show_heat = false;    // whether to show heat map
+        scope.x_pre_scale;          // pre-scale factor for x data
+        scope.y_pre_scale;          // pre-scale factor for y data
         var x_data;               // x data series to plot
         var y_data;               // y data series to plot
         var x_range;              // used for "auto-range" for chosen x category
@@ -48,6 +48,12 @@ app.directive('scatterplot', function() {
 
             scope.x_cat = scope.parameter_list[0];
             scope.y_cat = scope.parameter_list[0];
+
+            scope.x_transform = 'lin';
+            scope.y_transform = 'lin';
+
+            scope.x_pre_scale = '1';
+            scope.y_pre_scale = '1';
 
             // render initial data points
             scope.prev_position = scope.plot_data.map(function (d) {
