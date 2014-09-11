@@ -92,7 +92,7 @@ app.controller('ScatterController', ['$scope', function ($scope) {
             if (count < $scope.transition_count) return true;
 
             // transition for time t, in milliseconds
-            if (t > 1000) {
+            if (t > 2000) {
                 $scope.prev_position = next_position;
                 $scope.prev_position.forEach($scope.circle);
 
