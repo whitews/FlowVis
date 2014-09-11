@@ -246,9 +246,8 @@ app.controller(
                             $scope.fcs_file.event_data += "\r\n";
                         }
                         if (update_scope) {
-                            end_time = new Date().getTime();
+                            var end_time = new Date().getTime();
                             $scope.duration = end_time - $scope.start_time;
-                            console.log($scope.duration);
                             $scope.$apply();
                         }
                     }

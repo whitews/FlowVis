@@ -10,8 +10,8 @@ app.directive('scatterplot', function() {
             bottom: height - scope.canvas_height,
             left: width - scope.canvas_width
         };
-        var x_cat;                // chosen plot parameter for x-axis
-        var y_cat;                // chosen plot parameter for y-axis
+        scope.x_cat;                // chosen plot parameter for x-axis
+        scope.y_cat;                // chosen plot parameter for y-axis
         var x_transform;          // chosen transform for x-data
         var y_transform;          // chosen transform for y-data
         var show_heat = false;    // whether to show heat map
@@ -46,7 +46,8 @@ app.directive('scatterplot', function() {
                 }
             }
 
-
+            scope.x_cat = scope.parameter_list[0];
+            scope.y_cat = scope.parameter_list[0];
 
             // render initial data points
             scope.prev_position = scope.plot_data.map(function (d) {
