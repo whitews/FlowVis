@@ -108,7 +108,7 @@ circle.selected {
 }
 
 .instruction {
-    margin-top: 5%;
+    margin: 40px 10px;
     font: 36px bold "Optima", "FreeSerif";
     font-weight: 900;
     color: #c6c6c6;
