@@ -108,8 +108,8 @@ app.controller(
                         } else {
                             obj.channels.push(
                                 {
-                                    'channel': pns_result[1],
-                                    'pns': non_paired_list[i+1]
+                                    'channel': pnb_result[1],
+                                    'pnb': non_paired_list[i+1]
                                 }
                             );
                         }
