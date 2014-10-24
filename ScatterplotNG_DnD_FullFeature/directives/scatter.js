@@ -25,7 +25,7 @@ app.directive('scatterplot', function() {
         var y_scale;              // function to convert y data to svg pixels
         var flow_data;            // FCS data
         scope.parameter_list = [];  // flow data column names
-        var subsample_count = 10000;  // Number of events to subsample
+        var subsample_count = 40000;  // Number of events to subsample
 
         // Transition variables
         scope.prev_position = [];         // prev_position [x, y, color] pairs
@@ -35,6 +35,9 @@ app.directive('scatterplot', function() {
             if (!data) {
                 return;
             }
+
+            // reset parameter list
+            scope.parameter_list = [];
 
             data = d3.csv.parse(data);
             scope.plot_data = data.slice(0, subsample_count);
