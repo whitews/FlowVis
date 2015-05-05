@@ -15,8 +15,8 @@ app.directive('scatterplot', function() {
         scope.x_transform;          // chosen transform for x-data
         scope.y_transform;          // chosen transform for y-data
         scope.show_heat = false;    // whether to show heat map
-        scope.x_pre_scale;          // pre-scale factor for x data
-        scope.y_pre_scale;          // pre-scale factor for y data
+        scope.x_pre_scale = 1.0;          // pre-scale factor for x data
+        scope.y_pre_scale = 1.0;          // pre-scale factor for y data
         var x_data;               // x data series to plot
         var y_data;               // y data series to plot
         var x_range;              // used for "auto-range" for chosen x category
