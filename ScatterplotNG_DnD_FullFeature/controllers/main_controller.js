@@ -116,6 +116,17 @@ app.controller(
                     }
                 }
 
+                // Sort obj channels by channel number
+                obj.channels.sort(function (a,b) {
+                    if (parseInt(a.channel) < parseInt(b.channel)) {
+                        return -1;
+                    } else if (parseInt(a.channel) > parseInt(b.channel)) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
                 // Now check our channels for missing PnS fields, since
                 // they are optional in the FCS file. Add empty strings,
                 // where they are missing
