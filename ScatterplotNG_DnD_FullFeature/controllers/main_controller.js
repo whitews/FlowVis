@@ -204,86 +204,84 @@ app.controller(
             // validate data segment length matches total events
             var total_bytes = (obj.data_end - obj.data_begin + 1);
             var event_bytes = ($scope.fcs_file.event_bit_count / 8);
-            if (total_bytes/ event_bytes != $scope.fcs_file.event_count) {
+            if (total_bytes / event_bytes !== parseInt($scope.fcs_file.event_count)) {
                 return;
             }
 
-            var blob_begin = null;
-            var blob_end = null;
+            var default_chunk_size = 500;  // chunk size is in number of events
+            var chunk_event_count;
 
-            var chunk_size = 500;  // chunk size is in number of events
-            var subsample_count = 40000;
-            for (var i = 0; i < $scope.fcs_file.event_count; i = i + chunk_size) {
-                if (i > subsample_count) {
-                    break;
-                }
+            var byte_offset = obj.data_begin;
+            var value_length = null;  // in bytes
+            var value = null;
 
-                blob_begin = obj.data_begin + (event_bytes * i);
-                blob_end = blob_begin + (chunk_size * event_bytes);
+            var readChunk = function(blob_begin, blob_end, obj) {
+                var reader = new FileReader();
                 var blob = obj.file.slice(blob_begin, blob_end);
 
-                var reader = new FileReader();
-                var update_scope = false;
-                if (i + chunk_size >= $scope.fcs_file.event_count - 1 || i >= subsample_count) {
-                    update_scope = true
-                }
-                reader.onloadend = function (update_scope) {
-                    return function(evt) {
-                        var byte_offset = 0;
-                        var value_length = null;  // in bytes
-                        var value = null;
+                chunk_event_count = blob.size / event_bytes;
 
-                        // create DataView to read events in chunked blob
-                        var data_view = new DataView(evt.target.result.slice(
-                                    byte_offset,
-                                    chunk_size * event_bytes)
-                                );
-                        for (var j = 0; j < chunk_size; j++) {
-                            var event_data = [];
-
-                            // add CSV data for this event
-                            $scope.fcs_file.channels.forEach(function(channel) {
-                                value_length = parseInt(channel.pnb) / 8;
-
-                                value = data_view.getFloat32(
-                                    byte_offset,
-                                    $scope.fcs_file.little_endian
-                                );
-                                event_data.push(value);
-                                byte_offset = byte_offset + value_length;
-                            });
-
-                            $scope.fcs_file.event_data += event_data.join(',');
-                            $scope.fcs_file.event_data += "\r\n";
-                        }
-                        if (update_scope) {
-                            var end_time = new Date().getTime();
-                            $scope.duration = end_time - $scope.start_time;
-                            $scope.$apply();
-                        }
-                    }
-                }(update_scope);
-
+                reader.onload = readEventHandler;
                 reader.readAsArrayBuffer(blob);
-            }
+            };
+
+            var readEventHandler = function(evt) {
+                // create DataView to read events in chunked blob
+                var data_view = new DataView(evt.target.result);
+
+                // iterate over events in this chunk
+                var chunk_offset = 0;
+                for (var j = 0; j < chunk_event_count; j++) {
+                    var event_data = [];
+
+                    // add CSV data for this event
+                    $scope.fcs_file.channels.forEach(function(channel) {
+                        value_length = parseInt(channel.pnb) / 8;
+
+                        value = data_view.getFloat32(
+                            chunk_offset,
+                            $scope.fcs_file.little_endian
+                        );
+                        event_data.push(value);
+                        chunk_offset += value_length;
+                    });
+
+                    $scope.fcs_file.event_data += event_data.join(',');
+                    $scope.fcs_file.event_data += "\r\n";
+                }
+
+                byte_offset += evt.target.result.byteLength;
+
+                if (byte_offset >= obj.data_end) {
+                    var end_time = new Date().getTime();
+                    $scope.duration = end_time - $scope.start_time;
+                    $scope.$apply();
+                } else {
+                    // read the next chunk
+                    blob_end = byte_offset + (chunk_event_count * event_bytes);
+                    readChunk(byte_offset, blob_end, obj)
+                }
+            };
+
+            // read first chunk
+            var blob_end = byte_offset + (default_chunk_size * event_bytes);
+            readChunk(byte_offset, blob_end, obj)
         }
 
         $scope.onFileSelect = function($files) {
+            // only read one file
+            $scope.start_time = new Date().getTime();
+            setupReader({
+                filename: $files[0].name,
+                file: $files[0],
+                date: "",
+                metadata: {},
+                selected: false,
+                acquisition_date: null,
+                event_bit_count: null,
+                event_data: ''
+            });
 
-            for (var i = 0; i < $files.length; i++) {
-                $scope.start_time = new Date().getTime();
-                setupReader({
-                    filename: $files[i].name,
-                    file: $files[i],
-                    date: "",
-                    metadata: {},
-                    selected: false,
-                    acquisition_date: null,
-                    event_bit_count: null,
-                    event_data: ''
-                });
-                break;  // only read one file
-            }
             $scope.$apply();
         };
     }

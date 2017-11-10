@@ -25,11 +25,27 @@ app.directive('scatterplot', function() {
         var y_scale;              // function to convert y data to svg pixels
         var flow_data;            // FCS data
         scope.parameter_list = [];  // flow data column names
-        var subsample_count = 40000;  // Number of events to subsample
+        var subsample_count = 10000;  // Number of events to subsample
 
         // Transition variables
         scope.prev_position = [];         // prev_position [x, y, color] pairs
         scope.transition_count = 0;       // used to cancel old transitions
+
+        function subsampleArray(array, size) {
+            var array_copy = array.slice(0);
+            var n = array.length;
+            var temp_element;
+            var index;
+            var min = n - size;
+
+            while (n-- > min) {
+                index = Math.floor((n + 1) * Math.random());
+                temp_element = array_copy[index];
+                array_copy[index] = array_copy[n];
+                array_copy[n] = temp_element;
+            }
+            return array_copy.slice(min);
+        }
 
         scope.$watch('data', function(data) {
             if (!data) {
@@ -40,7 +56,7 @@ app.directive('scatterplot', function() {
             scope.parameter_list = [];
 
             data = d3.csv.parse(data);
-            scope.plot_data = data.slice(0, subsample_count);
+            scope.plot_data = subsampleArray(data, subsample_count);
 
             // Grab our column names
             for (var key in scope.plot_data[0]) {
