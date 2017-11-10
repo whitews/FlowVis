@@ -208,7 +208,7 @@ app.controller(
                 return;
             }
 
-            var default_chunk_size = 500;  // chunk size is in number of events
+            var default_chunk_size = 5000;  // chunk size is in number of events
             var chunk_event_count;
 
             var byte_offset = obj.data_begin;
